@@ -5,6 +5,7 @@ table, th, td {
 table {
     table-layout: fixed;
     max-width: 1000px;
+    border-collapse: collapse;
 }
 
 tr:hover {

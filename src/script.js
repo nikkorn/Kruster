@@ -190,48 +190,50 @@ function Cluster(tableBody, scrollableParent, options)
     {
       var visibleScrollAreaTop    = this._scrollableParent.scrollTop;
       var visibleScrollAreaBottom = visibleScrollAreaTop + this._scrollableParent.clientHeight;
-      var clustersInView          = [];
-      var displayedClustersToHide = [];
+      var clustersToShow          = [];
 
       for (var i = 0; i < this._clusters.length; i++)
       {
         // Get the current cluster.
         var cluster = this._clusters[i];
 
-        // Keep track of the currently displayed clusters which may need to be hidden.
-        if (cluster.isDisplayed)
-        {
-          displayedClustersToHide.push(cluster);
-        }
-
         // Does this cluster overlap the visible area of he scrollable parent.
-        if (visibleScrollAreaTop < (cluster.offsetTop + cluster.height)
-            && cluster.offsetTop < visibleScrollAreaBottom)
+        if (visibleScrollAreaTop < (cluster.offsetTop + cluster.height) && cluster.offsetTop < visibleScrollAreaBottom)
         {
-          // This cluster is currently in the viewable portion of the scrollable parent.
-          clustersInView.push(cluster);
-
-          // Exclude this cluster from those which are currently displayed but need to be hidden.
-          var displayedClusterIndex = displayedClustersToHide.indexOf(cluster);
-          if (displayedClusterIndex > -1)
+          // This cluster is currently in the viewable portion of the scrollable parent.          
+          if (clustersToShow.indexOf(cluster) === -1)
           {
-            displayedClustersToHide.splice(displayedClusterIndex, 1);
+            clustersToShow.push(cluster);
+          }
+
+          // Add previous cluster.
+          if (this._clusters[i - 1] && clustersToShow.indexOf(this._clusters[i - 1]) === -1)
+          {
+            clustersToShow.push(this._clusters[i - 1]);
+          }
+
+          // Add next cluster.
+          if (this._clusters[i + 1] && clustersToShow.indexOf(this._clusters[i + 1]) === -1)
+          {
+            clustersToShow.push(this._clusters[i + 1]);
+          }
+        }
+        else
+        {
+          // Hide any clusters that shouldn't be shown but are shown.
+          if (cluster.isDisplayed && clustersToShow.indexOf(cluster) === -1) 
+          {
+            this._toggleCluster(cluster);
           }
         }
       }
 
-      // Toggle the displayed clusters which are no longer in view.
-      for (var i = 0; i < displayedClustersToHide.length; i++)
-      {
-        this._toggleCluster(displayedClustersToHide[i]);
-      }
-
       // Toggle the clusters in view to be displayed if they are not already.
-      for (var i = 0; i < clustersInView.length; i++)
+      for (var i = 0; i < clustersToShow.length; i++)
       {
-        if (!clustersInView[i].isDisplayed)
+        if (!clustersToShow[i].isDisplayed)
         {
-          this._toggleCluster(clustersInView[i]);
+          this._toggleCluster(clustersToShow[i]);
         }
       }
     };
