@@ -13,6 +13,9 @@
         // The scrollable parent.
         this._scrollableParent = scrollableParent;
 
+        // The table body.
+        this._tableBody = tableBody;
+
         // If we have not passed in any options, then just swap it for the defaults.
         this.options = options || this.defaultOptions;
 
@@ -28,6 +31,9 @@
         // The scroll position at the last cluster update.
         this._scrollPositionAtLastUpdate = this._scrollableParent.scrollTop;
 
+        // The scroll update handler.
+        this._scrollUpdateHandler = null;
+
         /**
          * Initialisation.
          */
@@ -36,11 +42,57 @@
             // Create the clusters.
             this._createClusters();
 
-            // Handle changes of the scrollable parent's scrollabel position.
-            scrollableParent.addEventListener("scroll", this._onParentScroll.bind(this));
+            // Handle changes of the scrollable parent's scrollable position.
+            this._scrollUpdateHandler = this._onParentScroll.bind(this);
+            scrollableParent.addEventListener("scroll", this._scrollUpdateHandler);
 
             // Do the initial update of setting cluster visibility.
             this._updateClusterVisibility();
+        };
+
+        /**
+         * Refresh the
+         */
+        this.refresh = function ()
+        {
+
+
+        };
+
+        /**
+         * Destroy this instance.
+         */
+        this.destroy = function ()
+        {
+            // Remove scroll event listener.
+            scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
+
+            // Clean the table.
+            this._cleanTable();
+        };
+
+        /**
+         * Clean the table, removing placeholders and displaying hidden rows.
+         */
+        this._cleanTable = function ()
+        {
+            // Iterate over all the rows in the table.
+            for (var i = 0; i < this._tableBody.rows.length; i++) 
+            {
+                // Get the current row.
+                var row = this._tableBody.rows[i];
+
+                // Remove this row if it is a placeholder, otherwise show it if it's hidden.
+                if (row.className === "kruster-placeholder")
+                {
+                    this._tableBody.removeChild(row);
+                    i--;
+                }
+                else
+                {
+                    row.style.display = "table-row";
+                }
+            }
         };
 
         /**
@@ -52,10 +104,10 @@
             var clusters = [];
 
             // Iterate over all the rows in the table.
-            for (var i = 0; i < tableBody.rows.length; i++) 
+            for (var i = 0; i < this._tableBody.rows.length; i++) 
             {
                 // Get the current row.
-                var row = tableBody.rows[i];
+                var row = this._tableBody.rows[i];
 
                 // Is this a new cluster?
                 if (i % this._clusterSize == 0) 
@@ -92,12 +144,14 @@
                 var cluster = clusters[i];
 
                 // Create and inject the cluster placeholder row.
-                cluster.placeholder = tableBody.insertRow(cluster.firstRowIndex);
+                cluster.placeholder = this._tableBody.insertRow(cluster.firstRowIndex);
 
                 // Give the placeholder the appropriate height.
                 cluster.placeholder.style.height = cluster.height;
 
-                // It will no be visibile initially.
+                cluster.placeholder.className = "kruster-placeholder";
+
+                // It will no be visible initially.
                 cluster.placeholder.style.display = "none";
 
                 // TODO Add TDs to placholder with the table column widths. This will
