@@ -38,8 +38,7 @@ function Cluster(tableBody, scrollableParent, options)
       scrollableParent.addEventListener("scroll", this._onParentScroll.bind(this));
 
       // Do the initial update of setting cluster visibility.
-      //this._updateClusterVisibility();
-      setTimeout(this._updateClusterVisibility(), 5);
+      this._updateClusterVisibility();
     };
 
     /**
