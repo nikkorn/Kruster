@@ -17,6 +17,21 @@ declare class Kruster
 	constructor(tableBody: Element, scrollableParent: Element, options?: Kruster.Options);
 
 	/**
+	 * Get an array of all of the table rows excluding placeholders.
+	 */
+	getRows();
+
+	/**
+	 * Get a row at the specified index.
+	 */
+	getRowAt(index: number);
+
+	/**
+	 * Get the index of the specified row element.
+	 */
+	getRowIndex(rowElement: Element);
+
+	/**
 	 *  destroys the instance, reverting the table to its original state.
 	 */
 	destroy(): void;

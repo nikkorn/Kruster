@@ -21,6 +21,9 @@ function Kruster(tableBody, scrollableParent, options)
 	// Our array of clusters.
 	this._clusters = [];
 
+	// Our array of table rows
+	this._rows = [];
+
 	// Determine the cluster size.
 	this._clusterSize = this.options.clusterSize || this.defaultOptions.clusterSize;
 
@@ -55,6 +58,44 @@ function Kruster(tableBody, scrollableParent, options)
 	this.refresh = function ()
 	{
 		// TODO Refresh.
+	};
+
+	/**
+	 * Get an array of all of the table rows excluding placeholders.
+	 */
+	this.getRows = function ()
+	{
+		return this._rows;
+	};
+
+	/**
+	 * Get a row at the specified index.
+	 */
+	this.getRowAt = function (index)
+	{
+		return this._rows[index];
+	};
+
+	/**
+	 * Get the index of the specified row element.
+	 */
+	this.getRowIndex = function (rowElement)
+	{
+		// Iterate over all the rows in the table until we have found the one we are after.
+		for (var i = 0; i < this._rows.length; i++) 
+		{
+			// Get the current row.
+			var row = this._rows[i];
+
+			// Is this the row element we are looking for?
+			if(row === rowElement) 
+			{
+				return i;
+			}
+		}
+
+		// This row element was not found in the table.
+		return -1;
 	};
 
 	/**
@@ -106,6 +147,9 @@ function Kruster(tableBody, scrollableParent, options)
 		{
 			// Get the current row.
 			var row = this._tableBody.rows[i];
+
+			// Keep track of the original sequence of rows.
+			this._rows.push(row);
 
 			// Is this a new cluster?
 			if (i % this._clusterSize == 0) 
