@@ -99,6 +99,21 @@ function Kruster(tableBody, scrollableParent, options)
 	};
 
 	/**
+	 * Get the table body without the DOM and style modifications made by Kruster.
+	 */
+	this.getCleanTable = function ()
+	{
+		// Create a clone of the current table.
+		var tableBodyClone = this._tableBody.cloneNode(true);
+
+		// Cleanse the table of any placeholders and styles applied by Kruster.
+		this._cleanTable(tableBodyClone);
+
+		// Return the clean table.
+		return tableBodyClone;
+	};
+
+	/**
 	 * Destroy this instance.
 	 */
 	this.destroy = function ()
@@ -107,24 +122,24 @@ function Kruster(tableBody, scrollableParent, options)
 		scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
 
 		// Clean the table.
-		this._cleanTable();
+		this._cleanTable(this._tableBody);
 	};
 
 	/**
 	 * Clean the table, removing placeholders and displaying hidden rows.
 	 */
-	this._cleanTable = function ()
+	this._cleanTable = function (table)
 	{
 		// Iterate over all the rows in the table.
-		for (var i = 0; i < this._tableBody.rows.length; i++) 
+		for (var i = 0; i < table.rows.length; i++) 
 		{
 			// Get the current row.
-			var row = this._tableBody.rows[i];
+			var row = table.rows[i];
 
 			// Remove this row if it is a placeholder, otherwise show it if it's hidden.
 			if (row.className === "kruster-placeholder")
 			{
-				this._tableBody.removeChild(row);
+				table.removeChild(row);
 				i--;
 			}
 			else

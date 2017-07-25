@@ -1,4 +1,4 @@
-// Type definitions for Kruster 0.0.1
+// Type definitions for Kruster 0.0.5
 // Project: Kruster
 // Definitions by: nikolas howard <https://github.com/nikkorn>
 
@@ -17,22 +17,29 @@ declare class Kruster
 	constructor(tableBody: Element, scrollableParent: Element, options?: Kruster.Options);
 
 	/**
-	 * Get an array of all of the table rows excluding placeholders.
+	 * Returns the table body without the DOM and style modifications made by Kruster.
 	 */
-	getRows();
+	getCleanTable(): Element;
 
 	/**
-	 * Get a row at the specified index.
+	 * Get an array of all of the table rows excluding placeholders.
 	 */
-	getRowAt(index: number);
+	getRows(): HTMLTableRowElement[];
+
+	/**
+	 * Get the row element at the specified index.
+	 * @param index The row index.
+	 */
+	getRowAt(index: number): HTMLTableRowElement;
 
 	/**
 	 * Get the index of the specified row element.
+	 * @param rowElement The row element.
 	 */
-	getRowIndex(rowElement: Element);
+	getRowIndex(rowElement: HTMLTableRowElement): number;
 
 	/**
-	 *  destroys the instance, reverting the table to its original state.
+	 * Destroys the instance, reverting the table to its original state.
 	 */
 	destroy(): void;
 }
