@@ -10,11 +10,9 @@ declare class Kruster
 {
 	/**
 	 * Create a new instance of Kruster and apply modifications to target table body.
-	 * @param tableBody the table body.
-	 * @param scrollableParent The potentially scrollable parent of the table body.
-	 * @param options the optional options.
+	 * @param config the configuration options.
 	 */
-	constructor(tableBody: Element, scrollableParent: Element, options?: Kruster.Options);
+	constructor(config: Kruster.Configuration);
 
 	/**
 	 * Returns the table body without the DOM and style modifications made by Kruster.
@@ -47,9 +45,50 @@ declare class Kruster
 declare namespace Kruster
 {
 	/**
-	 * Options to customize a new instance of Kruster.
+	 * Configuration options to create a new instance of Kruster.
 	 */
-	interface Options
+	interface Configuration
 	{
+		/**
+		 * The target table body.
+		 */
+		tableBody: Element;
+
+		/**
+		 * The potentially scrollable parent of the table body.
+		 */
+		scrollableParent: Element;
+
+		/**
+		 * The size of the the table row clusters. Default: 100.
+		 */
+		clusterSize?: number;
+
+		/**
+		 * Callback which is called when a cluster is made visible.
+		 */
+		onClusterShow?(event: ClusterChangeEvent): void;		
+
+		/**
+		 * Callback which is called when a cluster is made hidden.
+		 */
+		onClusterHide?(event: ClusterChangeEvent): void;
+	}
+
+	/**
+	 * Cluster visibility change event details.
+	 */
+	interface ClusterChangeEvent
+	{
+		/**
+		 * The cluster index.
+		 */
+		clusterIndex: number;
+
+		/**
+		 * The row elements of the cluster.
+		 */
+		rows: HTMLTableRowElement[];	
 	}
 }
+

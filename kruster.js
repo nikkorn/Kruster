@@ -1,27 +1,25 @@
 "use strict";
 
-function Kruster(tableBody, scrollableParent, options) 
+function Kruster(options) 
 {
-	// TODO Check validity of table and scrollableParent.
-
 	// The default options.
 	this.defaultOptions = {
 		clusterSize: 100
 	}
 
 	// The scrollable parent.
-	this._scrollableParent = scrollableParent;
+	this._scrollableParent = options.scrollableParent;
 
 	// The table body.
-	this._tableBody = tableBody;
+	this._tableBody = options.tableBody;
 
 	// If we have not passed in any options, then just swap it for the defaults.
-	this.options = options || this.defaultOptions;
+	this.options = options;
 
 	// Our array of clusters.
 	this._clusters = [];
 
-	// Our array of table rows
+	// Our array of table rows.
 	this._rows = [];
 
 	// Determine the cluster size.
@@ -46,7 +44,7 @@ function Kruster(tableBody, scrollableParent, options)
 
 		// Handle changes of the scrollable parent's scrollable position.
 		this._scrollUpdateHandler = this._onParentScroll.bind(this);
-		scrollableParent.addEventListener("scroll", this._scrollUpdateHandler);
+		this._scrollableParent.addEventListener("scroll", this._scrollUpdateHandler);
 
 		// Do the initial update of setting cluster visibility.
 		this._updateClusterVisibility();
@@ -119,7 +117,7 @@ function Kruster(tableBody, scrollableParent, options)
 	this.destroy = function ()
 	{
 		// Remove scroll event listener.
-		scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
+		this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
 
 		// Clean the table.
 		this._cleanTable(this._tableBody);
