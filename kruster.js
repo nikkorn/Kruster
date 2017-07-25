@@ -145,7 +145,7 @@ function Kruster(tableBody, scrollableParent, options)
 			cluster.placeholder = this._tableBody.insertRow(cluster.firstRowIndex);
 
 			// Give the placeholder the appropriate height.
-			cluster.placeholder.style.height = cluster.height;
+			cluster.placeholder.style.height = cluster.height + "px";
 
 			cluster.placeholder.className = "kruster-placeholder";
 
