@@ -1,0 +1,31 @@
+{
+  "name": "kruster",
+  "version": "0.0.1",
+  "description": "A small tool to help improve the rendering performance of very large HTML tables.",
+  "main": "kruster.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikkorn/Kruster.git"
+  },
+  "keywords": [
+    "cluster",
+    "table",
+    "speed",
+    "large",
+    "data",
+    "set",
+    "HTML",
+    "rows",
+    "fast",
+    "clustered"
+  ],
+  "author": "nikolas howard",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nikkorn/Kruster/issues"
+  },
+  "homepage": "https://github.com/nikkorn/Kruster#readme"
+}

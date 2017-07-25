@@ -51,12 +51,11 @@
         };
 
         /**
-         * Refresh the
+         * Refresh the instance to reflect changes to the table or scrollable parent.
          */
         this.refresh = function ()
         {
-
-
+            // TODO Refresh.
         };
 
         /**
