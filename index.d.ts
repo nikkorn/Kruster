@@ -1,4 +1,4 @@
-// Type definitions for Kruster 0.0.5
+// Type definitions for Kruster 0.1.0
 // Project: Kruster
 // Definitions by: nikolas howard <https://github.com/nikkorn>
 
@@ -91,4 +91,3 @@ declare namespace Kruster
 		rows: HTMLTableRowElement[];	
 	}
 }
-
