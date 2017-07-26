@@ -37,6 +37,11 @@ declare class Kruster
 	getRowIndex(rowElement: HTMLTableRowElement): number;
 
 	/**
+	 * Refresh the instance to reflect changes to the table layout.
+	 */
+	refresh(): void;
+
+	/**
 	 * Destroys the instance, reverting the table to its original state.
 	 */
 	destroy(): void;

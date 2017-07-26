@@ -51,11 +51,18 @@ function Kruster(options)
 	};
 
 	/**
-	 * Refresh the instance to reflect changes to the table or scrollable parent.
+	 * Refresh the instance to reflect changes to the table layout.
 	 */
 	this.refresh = function ()
 	{
-		// TODO Refresh.
+		// Clean the target table body.
+		this._cleanTable(this._tableBody);
+
+		// Recreate the clusters.
+		this._createClusters();
+
+		// Do an update of cluster visibility.
+		this._updateClusterVisibility();
 	};
 
 	/**
@@ -86,7 +93,7 @@ function Kruster(options)
 			var row = this._rows[i];
 
 			// Is this the row element we are looking for?
-			if(row === rowElement) 
+			if (row === rowElement) 
 			{
 				return i;
 			}
@@ -155,6 +162,9 @@ function Kruster(options)
 		// Create an empty clusters array.
 		var clusters = [];
 
+		// Make sure we are getting a new rows array.
+		this._rows = [];
+
 		// Iterate over all the rows in the table.
 		for (var i = 0; i < this._tableBody.rows.length; i++) 
 		{
@@ -189,8 +199,6 @@ function Kruster(options)
 			}
 		}
 
-		// TODO Get the column widths, these will need to be applied to TDs added to placeholder rows.
-
 		// Each cluster will have a placeholder row to replace it when we are not viewing it.
 		// This will be injected at the cluster position in the table.
 		for (var i = clusters.length - 1; i >= 0; i--) 
@@ -208,9 +216,6 @@ function Kruster(options)
 
 			// It will no be visible initially.
 			cluster.placeholder.style.display = "none";
-
-			// TODO Add TDs to placholder with the table column widths. This will
-			// stop the columns from resizing when clusters are hidden or shown.
 		}
 
 		// Update clusters with their offset from the top of the scrollable area
