@@ -27,5 +27,11 @@
   "bugs": {
     "url": "https://github.com/nikkorn/Kruster/issues"
   },
-  "homepage": "https://github.com/nikkorn/Kruster#readme"
+  "homepage": "https://github.com/nikkorn/Kruster#readme",
+  "devDependencies": {
+    "jasmine-core": "^2.6.4",
+    "karma": "^1.7.0",
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-jasmine": "^1.1.0"
+  }
 }
