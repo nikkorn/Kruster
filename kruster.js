@@ -365,21 +365,21 @@
 
 	// Export kruster.
 	if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') 
-    {
-        module.exports = Kruster;
-    }
-    else 
-    {
-        if (typeof define === 'function' && define.amd) 
-        {
-            define([], function() 
-            {
-                return Kruster;
-            });
-        }
-        else 
-        {
-            window.Kruster = Kruster;
-        }
-    }
+	{
+		module.exports = Kruster;
+	}
+	else 
+	{
+		if (typeof define === 'function' && define.amd) 
+		{
+			define([], function() 
+			{
+				return Kruster;
+			});
+		}
+		else 
+		{
+			window.Kruster = Kruster;
+		}
+	}
 })();
