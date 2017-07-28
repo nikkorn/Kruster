@@ -52,86 +52,6 @@
 		};
 
 		/**
-		 * Refresh the instance to reflect changes to the table layout.
-		 */
-		this.refresh = function ()
-		{
-			// Clean the target table body.
-			this._cleanTable(this._tableBody);
-
-			// Recreate the clusters.
-			this._createClusters();
-
-			// Do an update of cluster visibility.
-			this._updateClusterVisibility();
-		};
-
-		/**
-		 * Get an array of all of the table rows excluding placeholders.
-		 */
-		this.getRows = function ()
-		{
-			return this._rows;
-		};
-
-		/**
-		 * Get a row at the specified index.
-		 */
-		this.getRowAt = function (index)
-		{
-			return this._rows[index];
-		};
-
-		/**
-		 * Get the index of the specified row element.
-		 */
-		this.getRowIndex = function (rowElement)
-		{
-			// Iterate over all the rows in the table until we have found the one we are after.
-			for (var i = 0; i < this._rows.length; i++) 
-			{
-				// Get the current row.
-				var row = this._rows[i];
-
-				// Is this the row element we are looking for?
-				if (row === rowElement) 
-				{
-					return i;
-				}
-			}
-
-			// This row element was not found in the table.
-			return -1;
-		};
-
-		/**
-		 * Get the table body without the DOM and style modifications made by Kruster.
-		 */
-		this.getCleanTable = function ()
-		{
-			// Create a clone of the current table.
-			var tableBodyClone = this._tableBody.cloneNode(true);
-
-			// Cleanse the table of any placeholders and styles applied by Kruster.
-			this._cleanTable(tableBodyClone);
-
-			// Return the clean table.
-			return tableBodyClone;
-		};
-
-		/**
-		 * Destroy this instance.
-		 */
-		this.destroy = function ()
-		{
-			// Remove scroll event listener.
-			this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
-
-			// Clean the table.
-			this._cleanTable(this._tableBody);
-		};
-
-		/**
 		 * Clean the table, removing placeholders and displaying hidden rows.
 		 */
 		this._cleanTable = function (table)
@@ -361,6 +281,86 @@
 		};
 
 		this._init();
+	};
+
+	/**
+	 * Refresh the instance to reflect changes to the table layout.
+	 */
+	Kruster.prototype.refresh = function ()
+	{
+		// Clean the target table body.
+		this._cleanTable(this._tableBody);
+
+		// Recreate the clusters.
+		this._createClusters();
+
+		// Do an update of cluster visibility.
+		this._updateClusterVisibility();
+	};
+
+	/**
+	 * Get an array of all of the table rows excluding placeholders.
+	 */
+	Kruster.prototype.getRows = function ()
+	{
+		return this._rows;
+	};
+
+	/**
+	 * Get a row at the specified index.
+	 */
+	Kruster.prototype.getRowAt = function (index)
+	{
+		return this._rows[index];
+	};
+
+	/**
+	 * Get the index of the specified row element.
+	 */
+	Kruster.prototype.getRowIndex = function (rowElement)
+	{
+		// Iterate over all the rows in the table until we have found the one we are after.
+		for (var i = 0; i < this._rows.length; i++) 
+		{
+			// Get the current row.
+			var row = this._rows[i];
+
+			// Is this the row element we are looking for?
+			if (row === rowElement) 
+			{
+				return i;
+			}
+		}
+
+		// This row element was not found in the table.
+		return -1;
+	};
+
+	/**
+	 * Get the table body without the DOM and style modifications made by Kruster.
+	 */
+	Kruster.prototype.getCleanTable = function ()
+	{
+		// Create a clone of the current table.
+		var tableBodyClone = this._tableBody.cloneNode(true);
+
+		// Cleanse the table of any placeholders and styles applied by Kruster.
+		this._cleanTable(tableBodyClone);
+
+		// Return the clean table.
+		return tableBodyClone;
+	};
+
+	/**
+	 * Destroy this instance.
+	 */
+	Kruster.prototype.destroy = function ()
+	{
+		// Remove scroll event listener.
+		this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
+
+		// Clean the table.
+		this._cleanTable(this._tableBody);
 	};
 
 	// Export kruster.
