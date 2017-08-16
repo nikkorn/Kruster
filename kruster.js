@@ -26,14 +26,15 @@
 		// Determine the cluster size.
 		this._clusterSize = this.options.clusterSize || this.defaultOptions.clusterSize;
 
-		// The smallest cluster height in pixels.
-		this._minClusterHeight = null;
-
-		// The scroll position at the last cluster update.
-		this._scrollPositionAtLastUpdate = this._scrollableParent.scrollTop;
+		// The range of visible clusters for the last update.
+		this._lastVisibleClusterRange = { firstIndex : null, lastIndex: null };
 
 		// The scroll update handler.
 		this._scrollUpdateHandler = null;
+
+		// The buffer rows.
+		this._topRowBuffer    = null;
+		this._bottomRowBuffer = null;
 
 		/**
 		 * Initialisation.
@@ -56,19 +57,31 @@
 		 */
 		this._cleanTable = function (table)
 		{
-			// Iterate over all the rows in the table.
+			// No point in cleaning a table without rows.
+			if (table.rows.length === 0)
+			{
+				return;
+			}
+
+			// Get rid of the buffer rows.
+			var topRow = table.rows[0];
+			if (topRow.className === "kruster-top-row")
+			{
+				table.removeChild(topRow);
+			}
+			var bottomRow = table.rows[table.rows.length - 1];
+			if (bottomRow.className === "kruster-bottom-row")
+			{
+				table.removeChild(bottomRow);
+			}
+
+			// Show any hidden rows in the table.
 			for (var i = 0; i < table.rows.length; i++) 
 			{
 				// Get the current row.
 				var row = table.rows[i];
 
-				// Remove this row if it is a placeholder, otherwise show it if it's hidden.
-				if (row.className === "kruster-placeholder")
-				{
-					table.removeChild(row);
-					i--;
-				}
-				else
+				if (row.style.display === "none")
 				{
 					row.style.display = "table-row";
 				}
@@ -120,23 +133,19 @@
 				}
 			}
 
-			// Each cluster will have a placeholder row to replace it when we are not viewing it.
-			// This will be injected at the cluster position in the table.
-			for (var i = clusters.length - 1; i >= 0; i--) 
+			// Create the top and bottom row buffers.
+			this._topRowBuffer                 = this._tableBody.insertRow(0);
+			this._topRowBuffer.style.height    = "0px";
+			this._topRowBuffer.className       = "kruster-top-row";
+			this._bottomRowBuffer              = this._tableBody.insertRow();
+			this._bottomRowBuffer.style.height = "0px";
+			this._bottomRowBuffer.className    = "kruster-bottom-row";
+
+			// Calculate the total height of all the rows.
+			var totalHeight = 0;
+			for (var i = 0; i < clusters.length; i++) 
 			{
-				// Get the current cluster.
-				var cluster = clusters[i];
-
-				// Create and inject the cluster placeholder row.
-				cluster.placeholder = this._tableBody.insertRow(cluster.firstRowIndex);
-
-				// Give the placeholder the appropriate height.
-				cluster.placeholder.style.height = cluster.height + "px";
-
-				cluster.placeholder.className = "kruster-placeholder";
-
-				// It will no be visible initially.
-				cluster.placeholder.style.display = "none";
+				totalHeight += clusters[i].height;
 			}
 
 			// Update clusters with their offset from the top of the scrollable area
@@ -146,24 +155,12 @@
 			var overallOffsetTop = 0;
 			for (var i = 0; i < clusters.length; i++) 
 			{
-				// Update the clusters offset.
-				clusters[i].offsetTop = overallOffsetTop;
+				// Update the clusters top and bottom offset.
+				clusters[i].offsetTop    = overallOffsetTop;
+				clusters[i].offsetBottom = totalHeight - (overallOffsetTop + clusters[i].height);
 
-				// Update the overall offset with th height of this cluster.
+				// Update the overall offset with the height of this cluster.
 				overallOffsetTop += clusters[i].height;
-
-				// Update the minimum cluster height if we need to.
-				if (this._minClusterHeight) 
-				{
-					if (clusters[i].height < this._minClusterHeight) 
-					{
-						this._minClusterHeight = clusters[i].height;
-					}
-				} 
-				else 
-				{
-					this._minClusterHeight = clusters[i].height;
-				}
 			}
 
 			this._clusters = clusters;
@@ -183,9 +180,6 @@
 			{
 				cluster.rows[i].style.display = rowDisplayValue;
 			}
-
-			// Toggle the display value for the placeholder for this cluster.
-			cluster.placeholder.style.display = cluster.isDisplayed ? "none" : "table-row";
 
 			// Call the relevant onshow/onhide callback.
 			if (cluster.isDisplayed) 
@@ -212,16 +206,38 @@
 			// Get the amount the scrollable parent is scolled by.
 			var scrollTop = this._scrollableParent.scrollTop;
 
-			// Determine whether we should update our clusters based on
-			// how far we have scrolled since the last cluster update.
-			if (scrollTop > (this._scrollPositionAtLastUpdate + this._minClusterHeight) ||
-				scrollTop < (this._scrollPositionAtLastUpdate - this._minClusterHeight)) 
+			// Get the amount the scrollable parent is scolled by.
+			var visibleClusterRange = { 
+				firstIndex : this._getIndexOfClusterAtPoint(scrollTop), 
+				lastIndex: this._getIndexOfClusterAtPoint(scrollTop + this._scrollableParent.clientHeight) 
+			};
+
+			// Determine whether we should update our clusters based on how far we have scrolled since the last cluster update.
+			if (this._lastVisibleClusterRange.firstIndex !== visibleClusterRange.firstIndex ||
+				this._lastVisibleClusterRange.lastIndex !== visibleClusterRange.lastIndex) 
 			{
 				// Update the cluster visibility.
 				this._updateClusterVisibility();
 
-				// Update the scroll position for this update.
-				this._scrollPositionAtLastUpdate = scrollTop;
+				// Update the last visible cluster range for this update.
+				this._lastVisibleClusterRange = visibleClusterRange;
+			}
+		};
+
+		/**
+		 * Get the cluster that overlaps the specified point.
+		 */
+		this._getIndexOfClusterAtPoint = function(point) 
+		{
+			for (var i = 0; i < this._clusters.length; i++) 
+			{
+				// Get the current cluster.
+				var cluster = this._clusters[i];
+
+				if (point >= cluster.offsetTop && point <= (cluster.offsetTop + cluster.height))
+				{
+					return cluster.clusterIndex;
+				}
 			}
 		};
 
@@ -247,18 +263,6 @@
 					{
 						clustersToShow.push(cluster);
 					}
-
-					// Add previous cluster.
-					if (this._clusters[i - 1] && clustersToShow.indexOf(this._clusters[i - 1]) === -1) 
-					{
-						clustersToShow.push(this._clusters[i - 1]);
-					}
-
-					// Add next cluster.
-					if (this._clusters[i + 1] && clustersToShow.indexOf(this._clusters[i + 1]) === -1) 
-					{
-						clustersToShow.push(this._clusters[i + 1]);
-					}
 				} 
 				else 
 				{
@@ -269,6 +273,10 @@
 					}
 				}
 			}
+
+			// Update the heights of the buffer rows.
+			this._topRowBuffer.style.height    = clustersToShow[0].offsetTop;
+			this._bottomRowBuffer.style.height = clustersToShow[clustersToShow.length - 1].offsetBottom;
 
 			// Toggle the clusters in view to be displayed if they are not already.
 			for (var i = 0; i < clustersToShow.length; i++)
