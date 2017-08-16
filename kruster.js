@@ -48,8 +48,8 @@
 			this._scrollUpdateHandler = this._onParentScroll.bind(this);
 			this._scrollableParent.addEventListener("scroll", this._scrollUpdateHandler);
 
-			// Do the initial update of setting cluster visibility.
-			this._updateClusterVisibility();
+			// Manually call the scroll handler to do the initial update of setting cluster visibility.
+			this._scrollUpdateHandler();
 		};
 
 		/**
@@ -217,7 +217,7 @@
 				this._lastVisibleClusterRange.lastIndex !== visibleClusterRange.lastIndex) 
 			{
 				// Update the cluster visibility.
-				this._updateClusterVisibility();
+				this._updateClusterVisibility(visibleClusterRange);
 
 				// Update the last visible cluster range for this update.
 				this._lastVisibleClusterRange = visibleClusterRange;
@@ -244,33 +244,30 @@
 		/**
 		 * Update the visibility of the clusters which require a visibility change.
 		 */
-		this._updateClusterVisibility = function() 
+		this._updateClusterVisibility = function(visibleClusterRange) 
 		{
-			var visibleScrollAreaTop    = this._scrollableParent.scrollTop;
-			var visibleScrollAreaBottom = visibleScrollAreaTop + this._scrollableParent.clientHeight;
-			var clustersToShow          = [];
+			var clustersToShow = [];
 
+			// Get the first and last index of the clusters to show, this will include an extra one above and below.
+			var firstIndex = visibleClusterRange.firstIndex > 0 ? visibleClusterRange.firstIndex - 1 : 0; 
+			var lastIndex  = visibleClusterRange.lastIndex < (this._clusters.length - 1) ? visibleClusterRange.lastIndex + 1 : (this._clusters.length - 1); 
+
+			// Iterate over the clusters that are visible within the scrollable parent ...
+			for (var index = firstIndex; index <= lastIndex; index++) 
+			{
+				// ... And add it to the list of clusters to be shown.
+				clustersToShow.push(this._clusters[index]);
+			}
+
+			// Hide any clusters that are currently being displayed but shouldn't be.
 			for (var i = 0; i < this._clusters.length; i++) 
 			{
 				// Get the current cluster.
 				var cluster = this._clusters[i];
 
-				// Does this cluster overlap the visible area of he scrollable parent.
-				if (visibleScrollAreaTop < (cluster.offsetTop + cluster.height) && cluster.offsetTop < visibleScrollAreaBottom) 
+				if (cluster.isDisplayed && clustersToShow.indexOf(cluster) === -1) 
 				{
-					// This cluster is currently in the viewable portion of the scrollable parent.          
-					if (clustersToShow.indexOf(cluster) === -1) 
-					{
-						clustersToShow.push(cluster);
-					}
-				} 
-				else 
-				{
-					// Hide any clusters that shouldn't be shown but are shown.
-					if (cluster.isDisplayed && clustersToShow.indexOf(cluster) === -1) 
-					{
-						this._toggleCluster(cluster);
-					}
+					this._toggleCluster(cluster);
 				}
 			}
 
