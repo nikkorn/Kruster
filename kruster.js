@@ -65,12 +65,12 @@
 
 			// Get rid of the buffer rows.
 			var topRow = table.rows[0];
-			if (topRow.className === "kruster-row")
+			if (topRow.className === "kruster-row kruster-spacer-top")
 			{
 				table.removeChild(topRow);
 			}
 			var bottomRow = table.rows[table.rows.length - 1];
-			if (bottomRow.className === "kruster-row")
+			if (bottomRow.className === "kruster-row kruster-spacer-bottom")
 			{
 				table.removeChild(bottomRow);
 			}
