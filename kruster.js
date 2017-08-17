@@ -201,6 +201,12 @@
 		 */
 		this._onParentScroll = function() 
 		{
+			// There is no reason to go on if we have no clusters (meaning no rows).
+			if (this._clusters.length === 0)
+			{
+				return;
+			}
+
 			// Get the amount the scrollable parent is scolled by.
 			var scrollTop = this._scrollableParent.scrollTop;
 
