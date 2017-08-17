@@ -32,9 +32,9 @@
 		// The scroll update handler.
 		this._scrollUpdateHandler = null;
 
-		// The buffer rows.
-		this._topRowBuffer    = null;
-		this._bottomRowBuffer = null;
+		// The injected spacer rows.
+		this._topSpacerRow    = null;
+		this._bottomSpacerRow = null;
 
 		/**
 		 * Initialisation.
@@ -53,7 +53,7 @@
 		};
 
 		/**
-		 * Clean the table, removing placeholders and displaying hidden rows.
+		 * Clean the table, removing any DOM manipulations made by Kruster and displaying hidden rows.
 		 */
 		this._cleanTable = function (table)
 		{
@@ -65,12 +65,12 @@
 
 			// Get rid of the buffer rows.
 			var topRow = table.rows[0];
-			if (topRow.className === "kruster-top-row")
+			if (topRow.className === "kruster-row")
 			{
 				table.removeChild(topRow);
 			}
 			var bottomRow = table.rows[table.rows.length - 1];
-			if (bottomRow.className === "kruster-bottom-row")
+			if (bottomRow.className === "kruster-row")
 			{
 				table.removeChild(bottomRow);
 			}
@@ -134,12 +134,12 @@
 			}
 
 			// Create the top and bottom row buffers.
-			this._topRowBuffer                 = this._tableBody.insertRow(0);
-			this._topRowBuffer.style.height    = "0px";
-			this._topRowBuffer.className       = "kruster-top-row";
-			this._bottomRowBuffer              = this._tableBody.insertRow();
-			this._bottomRowBuffer.style.height = "0px";
-			this._bottomRowBuffer.className    = "kruster-bottom-row";
+			this._topSpacerRow                 = this._tableBody.insertRow(0);
+			this._topSpacerRow.style.height    = "0px";
+			this._topSpacerRow.className       = "kruster-row kruster-spacer-top";
+			this._bottomSpacerRow              = this._tableBody.insertRow();
+			this._bottomSpacerRow.style.height = "0px";
+			this._bottomSpacerRow.className    = "kruster-row kruster-spacer-bottom";
 
 			// Calculate the total height of all the rows.
 			var totalHeight = 0;
@@ -149,9 +149,7 @@
 			}
 
 			// Update clusters with their offset from the top of the scrollable area
-			// to speed up the process of mapping cluster positions to scroll position
-			// Also get the smallest cluster height. We will need this to help
-			// determine how often to check whther clusters need updating.
+			// to speed up the process of mapping cluster positions to scroll position.
 			var overallOffsetTop = 0;
 			for (var i = 0; i < clusters.length; i++) 
 			{
@@ -272,8 +270,8 @@
 			}
 
 			// Update the heights of the buffer rows.
-			this._topRowBuffer.style.height    = clustersToShow[0].offsetTop;
-			this._bottomRowBuffer.style.height = clustersToShow[clustersToShow.length - 1].offsetBottom;
+			this._topSpacerRow.style.height    = clustersToShow[0].offsetTop;
+			this._bottomSpacerRow.style.height = clustersToShow[clustersToShow.length - 1].offsetBottom;
 
 			// Toggle the clusters in view to be displayed if they are not already.
 			for (var i = 0; i < clustersToShow.length; i++)
@@ -304,7 +302,7 @@
 	};
 
 	/**
-	 * Get an array of all of the table rows excluding placeholders.
+	 * Get an array of all of the table rows excluding Kruster rows.
 	 */
 	Kruster.prototype.getRows = function ()
 	{
@@ -349,7 +347,7 @@
 		// Create a clone of the current table.
 		var tableBodyClone = this._tableBody.cloneNode(true);
 
-		// Cleanse the table of any placeholders and styles applied by Kruster.
+		// Cleanse the table of any DOM and style modifications applied by Kruster.
 		this._cleanTable(tableBodyClone);
 
 		// Return the clean table.
@@ -363,6 +361,10 @@
 	{
 		// Remove scroll event listener.
 		this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
+
+		// Empty our cluster and rows arrays.
+		this._rows     = [];
+		this._clusters = [];
 
 		// Clean the table.
 		this._cleanTable(this._tableBody);
