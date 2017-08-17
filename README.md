@@ -9,9 +9,15 @@
 $ npm install --save kruster
 ```
 
-## Documentation
+## Description
 
-### Examples
+Kruster is a tool used to speed up the performance of tables which contain a lot of content.
+
+To do this, it only renders rows which are actually visible within the client height of the specified element that wraps the table. 
+
+Kruster can handle rows of varying row height.
+
+### Example
 
 #### HTML 
 
@@ -65,7 +71,7 @@ var kruster = new Kruster({
 | :--------------------|:- |:- |
 | tableBody **(required)**  |DOM Element| The target table which contains the rows to cluster.|
 | scrollableParent **(required)** |DOM Element| The scrollable parent that wraps the target table. Only clusters which reside in the visible portion of this element will be displayed.|
-| clusterSize |number| The number of rows to each cluster. Smaller clusters mean more frequent updates but minimises the numer of rows being displayed. **Default: 100**  |
+| clusterSize |number| The number of rows to each cluster. Smaller clusters mean more frequent updates but minimises the numer of rows being displayed. **Default: 25**  |
 | onClusterShow |function| Callback which is called when a cluster is shown. An object containing the clusters index and contained rows are passed as an argument.|
 | onClusterHide |function| Callback which is called when a cluster is hidden. An object containing the clusters index and contained rows are passed as an argument.|
 
@@ -77,15 +83,15 @@ Refreshes the `Kruster` instance. This is required when the size of the table or
 
 #### .getRows()
 
-Get an array of all of the table rows, excluding any cluster placeholder rows that were injected by `Kruster`.
+Get an array of all of the table rows, excluding any rows that were injected by `Kruster`.
 
 #### .getRowAt(index)
 
-Get a row at the specified index, excluding any cluster placeholder rows that were injected by `Kruster`.
+Get a row at the specified index, excluding any rows that were injected by `Kruster`.
 
 #### .getRowIndex(rowElement)
 
-Get the index of the specified row element in the clustered table, excluding any cluster placeholder rows that were injected by `Kruster`.
+Get the index of the specified row element in the clustered table, excluding any rows that were injected by `Kruster`.
 
 #### .getCleanTable()
 

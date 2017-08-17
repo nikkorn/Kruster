@@ -1,6 +1,6 @@
 {
   "name": "kruster",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "A small tool to help improve the rendering performance of very large HTML tables.",
   "main": "kruster.js",
   "scripts": {

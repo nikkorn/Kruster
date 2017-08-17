@@ -5,7 +5,7 @@
 	{
 		// The default options.
 		this.defaultOptions = {
-			clusterSize: 100
+			clusterSize: 25
 		}
 
 		// The scrollable parent.
