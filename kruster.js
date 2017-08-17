@@ -276,8 +276,8 @@
 			}
 
 			// Update the heights of the buffer rows.
-			this._topSpacerRow.style.height    = clustersToShow[0].offsetTop;
-			this._bottomSpacerRow.style.height = clustersToShow[clustersToShow.length - 1].offsetBottom;
+			this._topSpacerRow.style.height    = clustersToShow[0].offsetTop + "px";
+			this._bottomSpacerRow.style.height = clustersToShow[clustersToShow.length - 1].offsetBottom + "px";
 
 			// Toggle the clusters in view to be displayed if they are not already.
 			for (var i = 0; i < clustersToShow.length; i++)
