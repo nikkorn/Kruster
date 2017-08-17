@@ -297,8 +297,8 @@
 		// Recreate the clusters.
 		this._createClusters();
 
-		// Do an update of cluster visibility.
-		this._updateClusterVisibility();
+		// Manually call the scroll handler to do the update of setting cluster visibility.
+		this._scrollUpdateHandler();
 	};
 
 	/**
