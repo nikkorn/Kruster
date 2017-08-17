@@ -1,4 +1,4 @@
-// Type definitions for Kruster 0.2.2
+// Type definitions for Kruster 1.0.0
 // Project: Kruster
 // Definitions by: nikolas howard <https://github.com/nikkorn>
 
@@ -20,7 +20,7 @@ declare class Kruster
 	getCleanTable(): Element;
 
 	/**
-	 * Get an array of all of the table rows excluding placeholders.
+	 * Get an array of all of the table rows excluding kruster rows.
 	 */
 	getRows(): HTMLTableRowElement[];
 

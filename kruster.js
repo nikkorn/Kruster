@@ -5,7 +5,7 @@
 	{
 		// The default options.
 		this.defaultOptions = {
-			clusterSize: 100
+			clusterSize: 25
 		}
 
 		// The scrollable parent.
@@ -26,14 +26,15 @@
 		// Determine the cluster size.
 		this._clusterSize = this.options.clusterSize || this.defaultOptions.clusterSize;
 
-		// The smallest cluster height in pixels.
-		this._minClusterHeight = null;
-
-		// The scroll position at the last cluster update.
-		this._scrollPositionAtLastUpdate = this._scrollableParent.scrollTop;
+		// The range of visible clusters for the last update.
+		this._lastVisibleClusterRange = { firstIndex : null, lastIndex: null };
 
 		// The scroll update handler.
 		this._scrollUpdateHandler = null;
+
+		// The injected spacer rows.
+		this._topSpacerRow    = null;
+		this._bottomSpacerRow = null;
 
 		/**
 		 * Initialisation.
@@ -47,28 +48,40 @@
 			this._scrollUpdateHandler = this._onParentScroll.bind(this);
 			this._scrollableParent.addEventListener("scroll", this._scrollUpdateHandler);
 
-			// Do the initial update of setting cluster visibility.
-			this._updateClusterVisibility();
+			// Manually call the scroll handler to do the initial update of setting cluster visibility.
+			this._scrollUpdateHandler();
 		};
 
 		/**
-		 * Clean the table, removing placeholders and displaying hidden rows.
+		 * Clean the table, removing any DOM manipulations made by Kruster and displaying hidden rows.
 		 */
 		this._cleanTable = function (table)
 		{
-			// Iterate over all the rows in the table.
+			// No point in cleaning a table without rows.
+			if (table.rows.length === 0)
+			{
+				return;
+			}
+
+			// Get rid of the buffer rows.
+			var topRow = table.rows[0];
+			if (topRow.className === "kruster-row kruster-spacer-top")
+			{
+				table.removeChild(topRow);
+			}
+			var bottomRow = table.rows[table.rows.length - 1];
+			if (bottomRow.className === "kruster-row kruster-spacer-bottom")
+			{
+				table.removeChild(bottomRow);
+			}
+
+			// Show any hidden rows in the table.
 			for (var i = 0; i < table.rows.length; i++) 
 			{
 				// Get the current row.
 				var row = table.rows[i];
 
-				// Remove this row if it is a placeholder, otherwise show it if it's hidden.
-				if (row.className === "kruster-placeholder")
-				{
-					table.removeChild(row);
-					i--;
-				}
-				else
+				if (row.style.display === "none")
 				{
 					row.style.display = "table-row";
 				}
@@ -120,50 +133,32 @@
 				}
 			}
 
-			// Each cluster will have a placeholder row to replace it when we are not viewing it.
-			// This will be injected at the cluster position in the table.
-			for (var i = clusters.length - 1; i >= 0; i--) 
+			// Create the top and bottom row buffers.
+			this._topSpacerRow                 = this._tableBody.insertRow(0);
+			this._topSpacerRow.style.height    = "0px";
+			this._topSpacerRow.className       = "kruster-row kruster-spacer-top";
+			this._bottomSpacerRow              = this._tableBody.insertRow();
+			this._bottomSpacerRow.style.height = "0px";
+			this._bottomSpacerRow.className    = "kruster-row kruster-spacer-bottom";
+
+			// Calculate the total height of all the rows.
+			var totalHeight = 0;
+			for (var i = 0; i < clusters.length; i++) 
 			{
-				// Get the current cluster.
-				var cluster = clusters[i];
-
-				// Create and inject the cluster placeholder row.
-				cluster.placeholder = this._tableBody.insertRow(cluster.firstRowIndex);
-
-				// Give the placeholder the appropriate height.
-				cluster.placeholder.style.height = cluster.height + "px";
-
-				cluster.placeholder.className = "kruster-placeholder";
-
-				// It will no be visible initially.
-				cluster.placeholder.style.display = "none";
+				totalHeight += clusters[i].height;
 			}
 
 			// Update clusters with their offset from the top of the scrollable area
-			// to speed up the process of mapping cluster positions to scroll position
-			// Also get the smallest cluster height. We will need this to help
-			// determine how often to check whther clusters need updating.
+			// to speed up the process of mapping cluster positions to scroll position.
 			var overallOffsetTop = 0;
 			for (var i = 0; i < clusters.length; i++) 
 			{
-				// Update the clusters offset.
-				clusters[i].offsetTop = overallOffsetTop;
+				// Update the clusters top and bottom offset.
+				clusters[i].offsetTop    = overallOffsetTop;
+				clusters[i].offsetBottom = totalHeight - (overallOffsetTop + clusters[i].height);
 
-				// Update the overall offset with th height of this cluster.
+				// Update the overall offset with the height of this cluster.
 				overallOffsetTop += clusters[i].height;
-
-				// Update the minimum cluster height if we need to.
-				if (this._minClusterHeight) 
-				{
-					if (clusters[i].height < this._minClusterHeight) 
-					{
-						this._minClusterHeight = clusters[i].height;
-					}
-				} 
-				else 
-				{
-					this._minClusterHeight = clusters[i].height;
-				}
 			}
 
 			this._clusters = clusters;
@@ -183,9 +178,6 @@
 			{
 				cluster.rows[i].style.display = rowDisplayValue;
 			}
-
-			// Toggle the display value for the placeholder for this cluster.
-			cluster.placeholder.style.display = cluster.isDisplayed ? "none" : "table-row";
 
 			// Call the relevant onshow/onhide callback.
 			if (cluster.isDisplayed) 
@@ -212,63 +204,74 @@
 			// Get the amount the scrollable parent is scolled by.
 			var scrollTop = this._scrollableParent.scrollTop;
 
-			// Determine whether we should update our clusters based on
-			// how far we have scrolled since the last cluster update.
-			if (scrollTop > (this._scrollPositionAtLastUpdate + this._minClusterHeight) ||
-				scrollTop < (this._scrollPositionAtLastUpdate - this._minClusterHeight)) 
+			// Get the amount the scrollable parent is scolled by.
+			var visibleClusterRange = { 
+				firstIndex : this._getIndexOfClusterAtPoint(scrollTop), 
+				lastIndex: this._getIndexOfClusterAtPoint(scrollTop + this._scrollableParent.clientHeight) 
+			};
+
+			// Determine whether we should update our clusters based on how far we have scrolled since the last cluster update.
+			if (this._lastVisibleClusterRange.firstIndex !== visibleClusterRange.firstIndex ||
+				this._lastVisibleClusterRange.lastIndex !== visibleClusterRange.lastIndex) 
 			{
 				// Update the cluster visibility.
-				this._updateClusterVisibility();
+				this._updateClusterVisibility(visibleClusterRange);
 
-				// Update the scroll position for this update.
-				this._scrollPositionAtLastUpdate = scrollTop;
+				// Update the last visible cluster range for this update.
+				this._lastVisibleClusterRange = visibleClusterRange;
+			}
+		};
+
+		/**
+		 * Get the cluster that overlaps the specified point.
+		 */
+		this._getIndexOfClusterAtPoint = function(point) 
+		{
+			for (var i = 0; i < this._clusters.length; i++) 
+			{
+				// Get the current cluster.
+				var cluster = this._clusters[i];
+
+				if (point >= cluster.offsetTop && point <= (cluster.offsetTop + cluster.height))
+				{
+					return cluster.clusterIndex;
+				}
 			}
 		};
 
 		/**
 		 * Update the visibility of the clusters which require a visibility change.
 		 */
-		this._updateClusterVisibility = function() 
+		this._updateClusterVisibility = function(visibleClusterRange) 
 		{
-			var visibleScrollAreaTop    = this._scrollableParent.scrollTop;
-			var visibleScrollAreaBottom = visibleScrollAreaTop + this._scrollableParent.clientHeight;
-			var clustersToShow          = [];
+			var clustersToShow = [];
 
+			// Get the first and last index of the clusters to show, this will include an extra one above and below.
+			var firstIndex = visibleClusterRange.firstIndex > 0 ? visibleClusterRange.firstIndex - 1 : 0; 
+			var lastIndex  = visibleClusterRange.lastIndex < (this._clusters.length - 1) ? visibleClusterRange.lastIndex + 1 : (this._clusters.length - 1); 
+
+			// Iterate over the clusters that are visible within the scrollable parent ...
+			for (var index = firstIndex; index <= lastIndex; index++) 
+			{
+				// ... And add it to the list of clusters to be shown.
+				clustersToShow.push(this._clusters[index]);
+			}
+
+			// Hide any clusters that are currently being displayed but shouldn't be.
 			for (var i = 0; i < this._clusters.length; i++) 
 			{
 				// Get the current cluster.
 				var cluster = this._clusters[i];
 
-				// Does this cluster overlap the visible area of he scrollable parent.
-				if (visibleScrollAreaTop < (cluster.offsetTop + cluster.height) && cluster.offsetTop < visibleScrollAreaBottom) 
+				if (cluster.isDisplayed && clustersToShow.indexOf(cluster) === -1) 
 				{
-					// This cluster is currently in the viewable portion of the scrollable parent.          
-					if (clustersToShow.indexOf(cluster) === -1) 
-					{
-						clustersToShow.push(cluster);
-					}
-
-					// Add previous cluster.
-					if (this._clusters[i - 1] && clustersToShow.indexOf(this._clusters[i - 1]) === -1) 
-					{
-						clustersToShow.push(this._clusters[i - 1]);
-					}
-
-					// Add next cluster.
-					if (this._clusters[i + 1] && clustersToShow.indexOf(this._clusters[i + 1]) === -1) 
-					{
-						clustersToShow.push(this._clusters[i + 1]);
-					}
-				} 
-				else 
-				{
-					// Hide any clusters that shouldn't be shown but are shown.
-					if (cluster.isDisplayed && clustersToShow.indexOf(cluster) === -1) 
-					{
-						this._toggleCluster(cluster);
-					}
+					this._toggleCluster(cluster);
 				}
 			}
+
+			// Update the heights of the buffer rows.
+			this._topSpacerRow.style.height    = clustersToShow[0].offsetTop;
+			this._bottomSpacerRow.style.height = clustersToShow[clustersToShow.length - 1].offsetBottom;
 
 			// Toggle the clusters in view to be displayed if they are not already.
 			for (var i = 0; i < clustersToShow.length; i++)
@@ -299,7 +302,7 @@
 	};
 
 	/**
-	 * Get an array of all of the table rows excluding placeholders.
+	 * Get an array of all of the table rows excluding Kruster rows.
 	 */
 	Kruster.prototype.getRows = function ()
 	{
@@ -344,7 +347,7 @@
 		// Create a clone of the current table.
 		var tableBodyClone = this._tableBody.cloneNode(true);
 
-		// Cleanse the table of any placeholders and styles applied by Kruster.
+		// Cleanse the table of any DOM and style modifications applied by Kruster.
 		this._cleanTable(tableBodyClone);
 
 		// Return the clean table.
@@ -358,6 +361,10 @@
 	{
 		// Remove scroll event listener.
 		this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
+
+		// Empty our cluster and rows arrays.
+		this._rows     = [];
+		this._clusters = [];
 
 		// Clean the table.
 		this._cleanTable(this._tableBody);
