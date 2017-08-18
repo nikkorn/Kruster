@@ -5,7 +5,8 @@
 	{
 		// The default options.
 		this.defaultOptions = {
-			clusterSize: 25
+			clusterSize: 25,
+			autoRefresh: true
 		}
 
 		// The scrollable parent.
@@ -25,6 +26,9 @@
 
 		// Determine the cluster size.
 		this._clusterSize = this.options.clusterSize || this.defaultOptions.clusterSize;
+
+		// Determine whether we will be auto refreshing this instance.
+		this._isAutoRefresh = this.options.autoRefresh || this.defaultOptions.autoRefresh;
 
 		// The range of visible clusters for the last update.
 		this._lastVisibleClusterRange = { firstIndex : null, lastIndex: null };
@@ -47,6 +51,17 @@
 			// Handle changes of the scrollable parent's scrollable position.
 			this._scrollUpdateHandler = this._onParentScroll.bind(this);
 			this._scrollableParent.addEventListener("scroll", this._scrollUpdateHandler);
+
+			// If we are auto refreshing we will have to wait for window resize
+			// events before asserting whether to refresh this instance.
+			if (this._isAutoRefresh)
+			{
+				var myEfficientFn = this._debounce(function() {
+					console.log("refresh");
+				}, 250);
+
+				window.addEventListener('resize', myEfficientFn);
+			}
 
 			// Manually call the scroll handler to do the initial update of setting cluster visibility.
 			this._scrollUpdateHandler();
@@ -286,6 +301,19 @@
 				{
 					this._toggleCluster(clustersToShow[i]);
 				}
+			}
+		};
+
+		/**
+		 * Helper debounce function.
+		 */
+		this._debounce = function(func, duration) 
+		{
+			var timeout;
+			return function () 
+			{
+				clearTimeout(timeout);
+				timeout = setTimeout(function () { func() }, duration);
 			}
 		};
 
