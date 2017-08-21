@@ -6,7 +6,7 @@
 		// The default options.
 		this.defaultOptions = {
 			clusterSize: 25,
-			autoRefresh: true
+			autoRefresh: false
 		}
 
 		// The scrollable parent.
@@ -36,6 +36,12 @@
 		// The scroll update handler.
 		this._scrollUpdateHandler = null;
 
+		// The id of the timeout waiting for the table to be displayed for a refresh.
+		this._postponedRefreshTimeoutId = null;
+
+		// The window resize handler used when auto-refreshing.
+		this._windowResizeHandler = null;
+
 		// The injected spacer rows.
 		this._topSpacerRow    = null;
 		this._bottomSpacerRow = null;
@@ -56,11 +62,14 @@
 			// events before asserting whether to refresh this instance.
 			if (this._isAutoRefresh)
 			{
-				var myEfficientFn = this._debounce(function() {
-					console.log("refresh");
+				var self = this;
+
+				// Intermittently handle window resize events and refresh this instance.
+				this._windowResizeHandler = this._debounce(function() {
+					self.refresh();
 				}, 250);
 
-				window.addEventListener('resize', myEfficientFn);
+				window.addEventListener('resize', this._windowResizeHandler);
 			}
 
 			// Manually call the scroll handler to do the initial update of setting cluster visibility.
@@ -325,14 +334,37 @@
 	 */
 	Kruster.prototype.refresh = function ()
 	{
-		// Clean the target table body.
-		this._cleanTable(this._tableBody);
+		// Determine whether the table is actually displayed at the moment.
+		// If it is not, postpone the refresh until it is.
+		if (this._tableBody.offsetParent === null)
+		{
+			// Check that there is not already a postponed refresh.
+			if (!this._postponedRefreshTimeoutId)
+			{
+				var self = this;
 
-		// Recreate the clusters.
-		this._createClusters();
+				// Attempt a refresh in a little while.
+				this._postponedRefreshTimeoutId = setTimeout(function () 
+				{
+					self._postponedRefreshTimeoutId = null;
 
-		// Manually call the scroll handler to do the update of setting cluster visibility.
-		this._scrollUpdateHandler();
+					self.refresh();
+				}, 50);
+			}
+		}
+		else 
+		{
+			this._postponedRefreshTimeoutId = null; 
+
+			// Clean the target table body.
+			this._cleanTable(this._tableBody);
+
+			// Recreate the clusters.
+			this._createClusters();
+
+			// Manually call the scroll handler to do the update of setting cluster visibility.
+			this._scrollUpdateHandler();
+		}
 	};
 
 	/**
@@ -393,6 +425,18 @@
 	 */
 	Kruster.prototype.destroy = function ()
 	{
+		// Stop any postponed refresh.
+		if (this._postponedRefreshTimeoutId)
+		{
+			clearTimeout(this._postponedRefreshTimeoutId);
+		}
+
+		// Stop listening for window resize events.
+		if (this._windowResizeHandler)
+		{
+			window.removeEventListener('resize', this._windowResizeHandler);
+		}
+
 		// Remove scroll event listener.
 		this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
 
