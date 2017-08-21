@@ -157,13 +157,16 @@
 				}
 			}
 
-			// Create the top and bottom row buffers.
-			this._topSpacerRow                 = this._tableBody.insertRow(0);
-			this._topSpacerRow.style.height    = "0px";
-			this._topSpacerRow.className       = "kruster-row kruster-spacer-top";
-			this._bottomSpacerRow              = this._tableBody.insertRow();
-			this._bottomSpacerRow.style.height = "0px";
-			this._bottomSpacerRow.className    = "kruster-row kruster-spacer-bottom";
+			// Create the top and bottom row buffers, only if we have any rows.
+			if (this._rows.length > 0) 
+			{
+				this._topSpacerRow                 = this._tableBody.insertRow(0);
+				this._topSpacerRow.style.height    = "0px";
+				this._topSpacerRow.className       = "kruster-row kruster-spacer-top";
+				this._bottomSpacerRow              = this._tableBody.insertRow();
+				this._bottomSpacerRow.style.height = "0px";
+				this._bottomSpacerRow.className    = "kruster-row kruster-spacer-bottom";
+			}
 
 			// Calculate the total height of all the rows.
 			var totalHeight = 0;
