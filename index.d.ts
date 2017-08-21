@@ -1,4 +1,4 @@
-// Type definitions for Kruster 1.0.5
+// Type definitions for Kruster 1.1.5
 // Project: Kruster
 // Definitions by: nikolas howard <https://github.com/nikkorn>
 
@@ -68,6 +68,11 @@ declare namespace Kruster
 		 * The size of the the table row clusters. Default: 100.
 		 */
 		clusterSize?: number;
+
+		/**
+		 * Whether Kruster should refresh in response to  window resize events. Default: false.
+		 */
+		autoRefresh?: boolean;
 
 		/**
 		 * Callback which is called when a cluster is made visible.
