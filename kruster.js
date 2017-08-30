@@ -290,6 +290,9 @@
 				clustersToShow.push(this._clusters[index]);
 			}
 
+			this._topSpacerRow.style.display    = "none";
+			this._bottomSpacerRow.style.display = "none";
+
 			// Hide any clusters that are currently being displayed but shouldn't be.
 			for (var i = 0; i < this._clusters.length; i++) 
 			{
@@ -314,6 +317,9 @@
 					this._toggleCluster(clustersToShow[i]);
 				}
 			}
+
+			this._topSpacerRow.style.display    = "";
+			this._bottomSpacerRow.style.display = "";
 		};
 
 		/**
