@@ -449,9 +449,11 @@
 		// Remove scroll event listener.
 		this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
 
-		// Empty our cluster and rows arrays.
-		this._rows     = [];
-		this._clusters = [];
+		// Empty our cluster and row arrays. Clear the spacer rows.
+		this._rows            = [];
+		this._clusters        = [];
+		this._topSpacerRow    = null;
+		this._bottomSpacerRow = null;
 
 		// Clean the table.
 		this._cleanTable(this._tableBody);

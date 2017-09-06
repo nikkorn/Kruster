@@ -1,4 +1,4 @@
-// Type definitions for Kruster 1.1.7
+// Type definitions for Kruster 1.1.8
 // Project: Kruster
 // Definitions by: nikolas howard <https://github.com/nikkorn>
 
