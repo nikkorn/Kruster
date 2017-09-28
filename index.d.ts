@@ -1,4 +1,4 @@
-// Type definitions for Kruster 1.1.8
+// Type definitions for Kruster 1.2.8
 // Project: Kruster
 // Definitions by: nikolas howard <https://github.com/nikkorn>
 
@@ -20,7 +20,7 @@ declare class Kruster
 	getCleanTable(): Element;
 
 	/**
-	 * Get an array of all of the table rows excluding kruster rows.
+	 * Get an array of all of the table rows excluding Kruster rows.
 	 */
 	getRows(): HTMLTableRowElement[];
 
@@ -43,8 +43,9 @@ declare class Kruster
 
 	/**
 	 * Destroys the instance, reverting the table to its original state.
+	 * @param removeTableModifications A flag defining whether the table should be cleansed of any modifications made by Kruster.
 	 */
-	destroy(): void;
+	destroy(removeTableModifications?: boolean): void;
 }
 
 declare namespace Kruster

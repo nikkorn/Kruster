@@ -432,7 +432,7 @@
 	/**
 	 * Destroy this instance.
 	 */
-	Kruster.prototype.destroy = function ()
+	Kruster.prototype.destroy = function (removeTableModifications)
 	{
 		// Stop any postponed refresh.
 		if (this._postponedRefreshTimeoutId)
@@ -455,8 +455,14 @@
 		this._topSpacerRow    = null;
 		this._bottomSpacerRow = null;
 
-		// Clean the table.
-		this._cleanTable(this._tableBody);
+		// If the 'removeTableModifications' argument was passed and is 'false', don't remove any 
+		// table modifications made by Kruster. In many cases this won't need to be done when
+		// we are throwing away the table at the same time as destroying this Kruster instance.
+		if (!(typeof removeTableModifications === 'boolean' && !removeTableModifications))
+		{
+			// Clean the table.
+			this._cleanTable(this._tableBody);
+		}
 	};
 
 	// Export kruster.

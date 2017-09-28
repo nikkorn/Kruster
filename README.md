@@ -71,8 +71,8 @@ var kruster = new Kruster({
 | :--------------------|:- |:- |
 | tableBody **(required)**  |DOM Element| The target table which contains the rows to cluster.|
 | scrollableParent **(required)** |DOM Element| The scrollable parent that wraps the target table. Only clusters which reside in the visible portion of this element will be displayed.|
-| clusterSize |number| The number of rows to each cluster. Smaller clusters mean more frequent updates but minimises the numer of rows being displayed. **Default: 25**  |
-| autoRefresh |boolean| Whether Kruster should refresh in response to  window resize events. **Default: false**  |
+| clusterSize |number| The number of rows to each cluster. Smaller clusters mean more frequent updates but minimises the number of rows being displayed. **Default: 25**  |
+| autoRefresh |boolean| Whether Kruster should refresh in response to window resize events. **Default: false**  |
 | onClusterShow |function| Callback which is called when a cluster is shown. An object containing the clusters index and contained rows are passed as an argument.|
 | onClusterHide |function| Callback which is called when a cluster is hidden. An object containing the clusters index and contained rows are passed as an argument.|
 
@@ -98,10 +98,11 @@ Get the index of the specified row element in the clustered table, excluding any
 
 Get the table body, cleansed of the DOM and style modifications made by `Kruster`. 
 
-#### .destroy()
+#### .destroy([removeTableModifications])
 
-Destroys the instance and removes any DOM and style modifications made by `Kruster`.
+Destroys the `Kruster` instance.
 
+Takes an optional boolean argument which defines whether the table should be cleansed of any modifications made by `Kruster`.  **Default: true**
 
 ## License
 
