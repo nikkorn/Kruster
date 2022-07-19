@@ -8,8 +8,18 @@
 
 <body>
   <script src="..\kruster.js"></script>
+  <script src="index.js"></script>
 
-  <div id="Table-wrapper">
+  <button type="button" onclick="initialise()">Initialise</button>
+  <button type="button" onclick="refresh()">Refresh</button>
+  <button type="button" onclick="destroy(true)">Destroy (Clean)</button>
+  <button type="button" onclick="destroy(false)">Destroy</button>
+  <label for="cluster-size">Cluster Size:</label>
+  <input type="number" id="cluster-size" name="cluster-size" value="15">
+  <br/>
+  <br/>
+
+  <div id="table-wrapper">
     <table>
       <colgroup>
         <col style="width:100px">
