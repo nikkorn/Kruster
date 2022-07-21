@@ -215,7 +215,7 @@
             // Get the amount the scrollable parent is scolled by.
             var scrollTop = this._scrollableParent.scrollTop;
 
-            // Get the amount the scrollable parent is scolled by.
+            // Get the visible cluster range based on the new scroll position. This is essentailly the first and last index of the clusters that are visible within the scrollable parent.
             var visibleClusterRange = {
                 firstIndex: this._getIndexOfClusterAtPoint(scrollTop),
                 lastIndex: this._getIndexOfClusterAtPoint(scrollTop + this._scrollableParent.clientHeight)
@@ -236,12 +236,14 @@
 
         /**
          * Get the cluster that overlaps the specified point.
+         * @param point The point representing the vertical position.
          */
         this._getIndexOfClusterAtPoint = function (point) {
             for (var i = 0; i < this._clusters.length; i++) {
                 // Get the current cluster.
                 var cluster = this._clusters[i];
 
+                // If the point lies between the top and the bottom of the current cluster then this is our cluster.
                 if (point >= cluster.offsetTop && point <= cluster.offsetTop + cluster.height) {
                     return cluster.clusterIndex;
                 }
@@ -250,6 +252,7 @@
 
         /**
          * Update the visibility of the clusters which require a visibility change.
+         * @param visibleClusterRange An object representing the range of visible cluster by exposing a start and end cluster index.
          */
         this._updateClusterVisibility = function (visibleClusterRange) {
             var clustersToShow = [];
