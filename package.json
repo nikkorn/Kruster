@@ -1,37 +1,39 @@
 {
-  "name": "kruster",
-  "version": "1.2.8",
-  "description": "A small tool to help improve the rendering performance of very large HTML tables.",
-  "main": "kruster.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nikkorn/Kruster.git"
-  },
-  "keywords": [
-    "cluster",
-    "table",
-    "speed",
-    "large",
-    "data",
-    "set",
-    "HTML",
-    "rows",
-    "fast",
-    "clustered"
-  ],
-  "author": "nikolas howard",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/nikkorn/Kruster/issues"
-  },
-  "homepage": "https://github.com/nikkorn/Kruster#readme",
-  "devDependencies": {
-    "jasmine-core": "^2.6.4",
-    "karma": "^1.7.0",
-    "karma-firefox-launcher": "^1.0.1",
-    "karma-jasmine": "^1.1.0"
-  }
+    "name": "kruster",
+    "version": "1.2.8",
+    "description": "A small tool to help improve the rendering performance of very large HTML tables.",
+    "main": "kruster.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prettier": "npx prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nikkorn/Kruster.git"
+    },
+    "keywords": [
+        "cluster",
+        "table",
+        "speed",
+        "large",
+        "data",
+        "set",
+        "HTML",
+        "rows",
+        "fast",
+        "clustered"
+    ],
+    "author": "nikolas howard",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/nikkorn/Kruster/issues"
+    },
+    "homepage": "https://github.com/nikkorn/Kruster#readme",
+    "devDependencies": {
+        "jasmine-core": "^2.6.4",
+        "karma": "^1.7.0",
+        "karma-firefox-launcher": "^1.0.1",
+        "karma-jasmine": "^1.1.0",
+        "prettier": "2.7.1"
+    }
 }

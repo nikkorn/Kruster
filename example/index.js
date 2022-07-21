@@ -4,7 +4,7 @@ let instance = null;
 /**
  * Initialise the Kruster instance.
  */
-function initialise () {
+function initialise() {
     if (instance) {
         console.warn("instance exists", instance);
     }
@@ -21,7 +21,7 @@ function initialise () {
 /**
  * Refresh the Kruster instance.
  */
-function refresh () {
+function refresh() {
     if (!instance) {
         console.warn("not initialised");
         return;
@@ -34,7 +34,7 @@ function refresh () {
  * Destroy the Kruster instance.
  * @param clean Whether to clean the table.
  */
-function destroy (clean) {
+function destroy(clean) {
     if (!instance) {
         console.warn("not initialised");
         return;
