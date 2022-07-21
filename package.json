@@ -1,8 +1,13 @@
 {
     "name": "kruster",
-    "version": "1.2.8",
+    "version": "1.2.9",
     "description": "A small tool to help improve the rendering performance of very large HTML tables.",
     "main": "kruster.js",
+    "types": "index.d.ts",
+    "files": [
+        "kruster.js",
+        "index.d.ts"
+    ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "prettier": "npx prettier --write ."
