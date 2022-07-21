@@ -75,6 +75,7 @@
 
         /**
          * Clean the table, removing any DOM manipulations made by Kruster and displaying hidden rows.
+         * @param table The table to clean.
          */
         this._cleanTable = function (table) {
             // No point in cleaning a table without rows.
@@ -82,20 +83,18 @@
                 return;
             }
 
-            // Get rid of the buffer rows.
-            var topRow = table.rows[0];
-            if (topRow.className === "kruster-row kruster-spacer-top") {
-                table.removeChild(topRow);
-            }
-            var bottomRow = table.rows[table.rows.length - 1];
-            if (bottomRow.className === "kruster-row kruster-spacer-bottom") {
-                table.removeChild(bottomRow);
+            // Get any kruster spacer rows in the grid. There should be a top and bottom spacer.
+            const krusterSpacerRows = table.getElementsByClassName("kruster-spacer-row");
+
+            // Remove our kruster spacer rows from the table.
+            while (krusterSpacerRows.length) {
+                krusterSpacerRows[0].remove();
             }
 
-            // Show any hidden rows in the table.
-            for (var i = 0; i < table.rows.length; i++) {
+            // Show any rows in the table that had been hidden.
+            for (var rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
                 // Get the current row.
-                var row = table.rows[i];
+                var row = table.rows[rowIndex];
 
                 if (row.style.display === "none") {
                     row.style.display = "table-row";
@@ -147,10 +146,10 @@
             if (this._rows.length > 0) {
                 this._topSpacerRow = this._tableBody.insertRow(0);
                 this._topSpacerRow.style.height = "0px";
-                this._topSpacerRow.className = "kruster-row kruster-spacer-top";
+                this._topSpacerRow.className = "kruster-spacer-row kruster-spacer-top";
                 this._bottomSpacerRow = this._tableBody.insertRow();
                 this._bottomSpacerRow.style.height = "0px";
-                this._bottomSpacerRow.className = "kruster-row kruster-spacer-bottom";
+                this._bottomSpacerRow.className = "kruster-spacer-row kruster-spacer-bottom";
             }
 
             // Calculate the total height of all the rows.
@@ -395,8 +394,9 @@
 
     /**
      * Destroy this instance.
+     * @param removeTableModifications Whether to remove all modifications that kruster has made to the table. Default: true.
      */
-    Kruster.prototype.destroy = function (removeTableModifications) {
+    Kruster.prototype.destroy = function (removeTableModifications = true) {
         // Stop any postponed refresh.
         if (this._postponedRefreshTimeoutId) {
             clearTimeout(this._postponedRefreshTimeoutId);
@@ -410,19 +410,18 @@
         // Remove scroll event listener.
         this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
 
+        // If the 'removeTableModifications' argument is true then remove any table modifications made by Kruster. 
+        // In many cases this won't need to be done when we are throwing away the table at the same time as destroying this Kruster instance.
+        if (removeTableModifications) {
+            // Clean the table.
+            this._cleanTable(this._tableBody);
+        }
+
         // Empty our cluster and row arrays. Clear the spacer rows.
         this._rows = [];
         this._clusters = [];
         this._topSpacerRow = null;
         this._bottomSpacerRow = null;
-
-        // If the 'removeTableModifications' argument was passed and is 'false', don't remove any
-        // table modifications made by Kruster. In many cases this won't need to be done when
-        // we are throwing away the table at the same time as destroying this Kruster instance.
-        if (!(typeof removeTableModifications === "boolean" && !removeTableModifications)) {
-            // Clean the table.
-            this._cleanTable(this._tableBody);
-        }
     };
 
     // Export kruster.
