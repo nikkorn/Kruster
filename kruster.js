@@ -422,7 +422,7 @@
         // Remove scroll event listener.
         this._scrollableParent.removeEventListener("scroll", this._scrollUpdateHandler);
 
-        // If the 'removeTableModifications' argument is true then remove any table modifications made by Kruster. 
+        // If the 'removeTableModifications' argument is true then remove any table modifications made by Kruster.
         // In many cases this won't need to be done when we are throwing away the table at the same time as destroying this Kruster instance.
         if (removeTableModifications) {
             // Clean the table.
