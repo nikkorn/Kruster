@@ -83,13 +83,8 @@
                 return;
             }
 
-            // Get any kruster spacer rows in the grid. There should be a top and bottom spacer.
-            const krusterSpacerRows = table.getElementsByClassName("kruster-spacer-row");
-
-            // Remove our kruster spacer rows from the table.
-            while (krusterSpacerRows.length) {
-                krusterSpacerRows[0].remove();
-            }
+            // Remove our spacer rows from the table.
+            this._removeSpacerRows(table);
 
             // Show any rows in the table that had been hidden.
             for (var rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
@@ -111,6 +106,9 @@
 
             // Make sure we are getting a new rows array.
             this._rows = [];
+
+            // We shouldn't have any kruster spacer rows in our table, but something might not have cleared up properly so we should try to remove them anyway.
+            this._removeSpacerRows(this._tableBody);
 
             // Iterate over all the rows in the table.
             for (var i = 0; i < this._tableBody.rows.length; i++) {
@@ -142,15 +140,15 @@
                 }
             }
 
-            // Create the top and bottom row buffers, only if we have any rows.
-            if (this._rows.length > 0) {
-                this._topSpacerRow = this._tableBody.insertRow(0);
-                this._topSpacerRow.style.height = "0px";
-                this._topSpacerRow.className = "kruster-spacer-row kruster-spacer-top";
-                this._bottomSpacerRow = this._tableBody.insertRow();
-                this._bottomSpacerRow.style.height = "0px";
-                this._bottomSpacerRow.className = "kruster-spacer-row kruster-spacer-bottom";
-            }
+            // Create the top spacer row and insert as the first table row.
+            this._topSpacerRow = this._tableBody.insertRow(0);
+            this._topSpacerRow.style.height = "0px";
+            this._topSpacerRow.className = "kruster-spacer-row kruster-spacer-top";
+
+            // Create the bottom spacer row and insert as the last table row.
+            this._bottomSpacerRow = this._tableBody.insertRow();
+            this._bottomSpacerRow.style.height = "0px";
+            this._bottomSpacerRow.className = "kruster-spacer-row kruster-spacer-bottom";
 
             // Calculate the total height of all the rows.
             var totalHeight = 0;
@@ -171,6 +169,20 @@
             }
 
             this._clusters = clusters;
+        };
+
+        /**
+         * Remove any spacer rows from the body of the specified table.
+         * @param table The table to remove any spacer rows from.
+         */
+        this._removeSpacerRows = function (table) {
+            // Get any kruster spacer rows in the grid. There might be a top and bottom spacer.
+            const krusterSpacerRows = table.getElementsByClassName("kruster-spacer-row");
+
+            // Remove our kruster spacer rows from the table if there are any.
+            while (krusterSpacerRows.length) {
+                krusterSpacerRows[0].remove();
+            }
         };
 
         /**
