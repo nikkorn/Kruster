@@ -434,6 +434,9 @@
         this._clusters = [];
         this._topSpacerRow = null;
         this._bottomSpacerRow = null;
+        this._scrollableParent = null;
+        this._tableBody = null;
+        this.options = {};
     };
 
     // Export kruster.
